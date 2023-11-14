@@ -4,6 +4,7 @@
 #include <Wire.h>
 #include "ttwr2.h"
 #include "gui/guiDisplay.h"
+#include "rf/SA868.h"
 
 #include <Adafruit_NeoPixel.h>
 
@@ -12,10 +13,12 @@ Adafruit_NeoPixel strip(1, PIXELS_PIN, NEO_GRB + NEO_KHZ800);
 XPowersPMU PMU;
 GuiDisplay guiDisplay;
 
-TaskHandle_t mainDisplayHandle;
+
 
 #define SerialMon Serial
 #define SerialAT  Serial1
+
+SA868 RF(&SerialAT);
 
 void setupPower()
 {
@@ -86,13 +89,28 @@ void setup()
 
     SerialAT.begin(9600, SERIAL_8N1, SA868_RX_PIN, SA868_TX_PIN);
 
-    delay(1000);
+    
 
     guiDisplay.Start();
+
+    guiDisplay.PauseLoop();
+    
+    delay(2000);
+    guiDisplay.clearDisplay();
+
+    String Version = RF.getVersion();
+    String Hardware = RF.getHardware();
+    guiDisplay.putText(Version.substring(0, 15), 1, 15, 1);
+    guiDisplay.putText(Hardware.substring(0, 15), 1, 30, 1);
+
+    delay(500);
+
+    guiDisplay.ResumeLoop();
 
     strip.begin();
     strip.show();
 }
+
 
 long timeCheck = 0;
 

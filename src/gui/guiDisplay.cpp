@@ -16,20 +16,19 @@ void GuiDisplay::displaySplash(String text)
     mainDisplay.setTextColor(WHITE);
 
     mainDisplay.setTextSize(1);
-    mainDisplay.setFont(&FreeSansBold9pt7b);
+    mainDisplay.setFont(&FreeSans9pt7b);
     mainDisplay.setCursor(0, 15);
-    mainDisplay.print("APRS");
-    mainDisplay.setCursor(0, 32);
-    mainDisplay.print("T-TWR+ 2.0");
+    mainDisplay.print(text);
+    mainDisplay.setCursor(0, 0);
     mainDisplay.display();
-    // mainDisplay.invertDisplay(true);
+    mainDisplay.setCursor(0, 0);
 }
 
 void GuiDisplay::putText(String text, int x, int y, int size)
 {
     mainDisplay.setTextSize(size);
     mainDisplay.setTextColor(WHITE);
-    mainDisplay.setFont(&FreeSansBold9pt7b);
+    mainDisplay.setFont();
     mainDisplay.setCursor(x, y);
     mainDisplay.print(text);
     mainDisplay.display();
@@ -38,6 +37,7 @@ void GuiDisplay::putText(String text, int x, int y, int size)
 void GuiDisplay::clearDisplay()
 {
     mainDisplay.clearDisplay();
+    mainDisplay.display();
 }
 
 void GuiDisplay::Start()
@@ -45,6 +45,7 @@ void GuiDisplay::Start()
 
     this->setupDisplay();
     this->displaySplash("TEST");
+    mainDisplay.dim(false);
 
     taskFinished = false;
     xTaskCreatePinnedToCore(
@@ -59,6 +60,23 @@ void GuiDisplay::Start()
 
 }
 
+void GuiDisplay::dot(int16_t x, int16_t y)
+{
+    // mainDisplay.drawChar(x, y, '.',  WHITE, BLACK, 1);
+    mainDisplay.drawPixel(x, y, WHITE);
+    mainDisplay.display();
+}
+
+void GuiDisplay::PauseLoop()
+{
+    vTaskSuspend(Task1);
+}
+
+void GuiDisplay::ResumeLoop()
+{
+    vTaskResume(Task1);
+}
+
 void GuiDisplay::mainLoop(void *pvParameters) {
     GuiDisplay *l_pThis = (GuiDisplay *) pvParameters; 
     long timeGui = 0;
@@ -71,11 +89,13 @@ void GuiDisplay::mainLoop(void *pvParameters) {
         
         for (int x = 0; x < SCREEN_WIDTH; x++) {
             int y = (sin(x * 2 * M_PI / SCREEN_WIDTH) + 1) * SCREEN_HEIGHT / 2;
-            l_pThis->putText(".", x, y + j , 1);
-            if (x == SCREEN_WIDTH - 1) {
-                l_pThis->clearDisplay();
-                j++;
-            }
+            l_pThis->dot(x, y);
+            l_pThis->dot(SCREEN_WIDTH-x, y);
+            l_pThis->dot(x, SCREEN_HEIGHT-y);
+            // if (x == SCREEN_WIDTH - 1) {
+            //     l_pThis->clearDisplay();
+            //     j++;
+            // }
         }
     }
 }

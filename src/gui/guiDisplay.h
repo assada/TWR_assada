@@ -2,7 +2,7 @@
 
 #include "Adafruit_SSD1306.h"
 #include <Adafruit_GFX.h>
-#include <Fonts/FreeSansBold9pt7b.h>
+#include <Fonts/FreeSans9pt7b.h>
 
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
 #define SCREEN_HEIGHT 64    // OLED display height, in pixels
@@ -15,6 +15,9 @@ class GuiDisplay
 {
     public:
         void setupDisplay();
+        void PauseLoop();
+        void ResumeLoop();
+        void dot(int16_t x, int16_t y);
         void displaySplash(String text);
         static void mainLoop(void *pvParameters);
         void putText(String text, int x, int y, int size);
