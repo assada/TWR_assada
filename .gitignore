@@ -1,0 +1,21 @@
+.pio
+main/configuration.h
+main/credentials.h
+
+# ignore vscode IDE settings files
+.vscode/*
+*.code-workspace
+
+.idea
+
+.DS_Store
+Thumbs.db
+.autotools
+.built
+.context
+.cproject
+.vagrant
+nanopb*
+flash.uf2
+cmake-build*
+__pycache__
