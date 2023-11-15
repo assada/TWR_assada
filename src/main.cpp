@@ -5,18 +5,19 @@
 #include "ttwr2.h"
 #include "gui/guiDisplay.h"
 #include "rf/SA868.h"
+#include "ble/bt.h"
 
 #include <Adafruit_NeoPixel.h>
+
+#define SerialMon Serial
+#define SerialAT  Serial1
 
 Adafruit_NeoPixel strip(1, PIXELS_PIN, NEO_GRB + NEO_KHZ800);
 
 XPowersPMU PMU;
 GuiDisplay guiDisplay;
+Bt bt(&SerialMon);
 
-
-
-#define SerialMon Serial
-#define SerialAT  Serial1
 
 SA868 RF(&SerialAT);
 
@@ -98,8 +99,8 @@ void setup()
     delay(2000);
     guiDisplay.clearDisplay();
 
-    String Version = RF.getVersion();
-    String Hardware = RF.getHardware();
+    const String Version = RF.getVersion();
+    const String Hardware = RF.getHardware();
     guiDisplay.putText(Version.substring(0, 15), 1, 15, 1);
     guiDisplay.putText(Hardware.substring(0, 15), 1, 30, 1);
 
@@ -109,6 +110,8 @@ void setup()
 
     strip.begin();
     strip.show();
+
+    bt.Start(&guiDisplay);
 }
 
 
