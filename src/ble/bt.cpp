@@ -88,112 +88,14 @@ void AprsBTCharacteristicCallbacks::onRead(BLECharacteristic *pCharacteristic)
 
     pCharacteristic->setValue(os.str());
 }
-//UT3USW-4>APFIIO,WIDE1-1,WIDE2-1:/140623h5031.21N/03030.46Ea/A=000390!w?k!
-
-
-
-//TODO: Temp (shit) solution
-
-typedef char passtime_t[30];
-
-#define KISS_FEND 0xC0
-#define KISS_FESC 0xDB
-#define KISS_TFEND 0xDC
-#define KISS_TFESC 0xDD
-#define MARK_GSTIME 0xBD
-bool decode_kiss(const char *in, const size_t in_len, size_t *in_ptr, char *out, size_t *out_len, size_t out_capacity, passtime_t *pt)
-{
-	bool fend = false;
-	bool esc = false;
-	*out_len = 0;
-	(*pt)[0] = 0;
-	for (; *in_ptr < in_len; ++*in_ptr) {
-		unsigned char c = in[*in_ptr];
-        Serial.println(c, HEX);
-		if (c == KISS_FEND && !fend) {
-			fend = true;
-            Serial.println("KISS_TFEND");
-			continue;
-		}
-		if (esc) {
-			if (c == KISS_TFEND) {
-                Serial.println("KISS_TFEND");
-				c = KISS_FEND;
-			} else if (c == KISS_TFESC) {
-                Serial.println("KISS_TFESC");
-				c = KISS_FESC;
-			} else if (c == MARK_GSTIME) {
-                Serial.println("MARK_GSTIME");
-				size_t i;
-				for (i = 0; i < sizeof(passtime_t) - 1; i++) {
-					++*in_ptr;
-					if (*in_ptr == in_len) {
-						i = 0;
-						break;
-					}
-					char x = in[*in_ptr];
-					(*pt)[i] = x;
-					if (x == 0) {
-						break;
-					}
-				}
-				(*pt)[i] = 0;
-				esc = false;
-				continue;
-			} else {
-				return false;
-			}
-		} else if (c == KISS_FESC) {
-            Serial.println("KISS_FESC");
-			esc = true;
-			continue;
-		} else if (c == KISS_FEND) {
-            Serial.println("KISS_FEND");
-			if (*out_len > 0) {
-				break;
-			} else {
-				continue;
-			}
-		}
-		esc = false;
-		if (*out_len == out_capacity) {
-			return false;
-		}
-		out[(*out_len)++] = c;
-	}
-	return fend;
-}
-
 
 void AprsBTCharacteristicCallbacks::onWrite(BLECharacteristic *pCharacteristic)
 {
-    uint8_t* rxData = pCharacteristic->getData();
-    size_t rxLength = pCharacteristic->getLength();
+    Serial.println("onWrite");
+    std::string rxValue = pCharacteristic->getValue(); // AX.25 KISS frame
 
-    if (rxData != nullptr && rxLength > 0)
-    {
-
-        for(size_t i = 0; i < rxLength; i++) {
-            Serial.printf("%02X ", rxData[i]); //JUST FOR DEBUG PURPOSES
-        }
-
-        for(size_t i = 0; i < rxLength; i++) {
-            Serial.printf("%u", rxData[i]); //JUST FOR DEBUG PURPOSES
-        }
-
-        char out_buf[329];
-        size_t out_len = 0;
-        size_t in_ptr = 0;
-        passtime_t pt;
-
-        if (decode_kiss((const char*)rxData, rxLength, &in_ptr, out_buf, &out_len, sizeof(out_buf), &pt)) // REAL THING
-        {
-            String decodedString(out_buf, out_len);
-            this->bt->monSerial->println(decodedString);
-        }
-        else
-        {
-            this->bt->monSerial->println("Error in KISS decoding");
-        }
+    if (rxValue.length() > 0) {
+        // for (int n = 0; n < rxValue.length(); n++)
+        //   kiss_serial((uint8_t)rxValue[n]);
     }
 }
