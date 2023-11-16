@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 
+#include "afsk/AFSK.h"
+
 #include "AT1846S.h"
 
 #define EU_APRS_FREQ 144.8

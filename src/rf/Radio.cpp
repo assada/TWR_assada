@@ -1,5 +1,4 @@
 #include "Radio.h"
-#include "afsk/AFSK.h"
 
 AFSK afsk;
 
