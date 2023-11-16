@@ -1,6 +1,10 @@
-Playground for the SA8x8 APRS tracker
+# Playground for the SA8x8 OpenRTX FW APRS TNC based on T-TWR Plus 2
+
+![Image](https://i.imgur.com/HoU9NQ2.png)
 
 https://github.com/OpenRTX/sa8x8-fw
+
+Use PlatformIO to build and upload the firmware.
 
 ### TODO:
 - [x] Basic structure for ESP32 and PIO
