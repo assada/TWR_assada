@@ -97,5 +97,6 @@ void AprsBTCharacteristicCallbacks::onWrite(BLECharacteristic *pCharacteristic)
     if (rxValue.length() > 0) {
         // for (int n = 0; n < rxValue.length(); n++)
         //   kiss_serial((uint8_t)rxValue[n]);
+        // TODO: Push bytes array to Queue
     }
 }
