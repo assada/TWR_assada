@@ -10,6 +10,7 @@ Use PlatformIO to build and upload the firmware.
 - [x] Basic structure for ESP32 and PIO
 - [x] BLE TNC
 - [x] Radio init FM@25kHz 144.800
+- [X] AX.25 to AFSK modulation
 - [ ] TX Queue
 - [ ] TX Beaconing
 - [ ] RX Task with APRS decoding

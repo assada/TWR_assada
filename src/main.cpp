@@ -118,6 +118,8 @@ void setup()
     strip.show();
 
     bt.Start(&guiDisplay);
+
+    Radio.Test();
 }
 
 
