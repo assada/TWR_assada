@@ -80,9 +80,7 @@ void GuiDisplay::ResumeLoop()
 void GuiDisplay::mainLoop(void *pvParameters) {
     GuiDisplay *l_pThis = (GuiDisplay *) pvParameters; 
     long timeGui = 0;
-    int j = 0;
     for (;;) {
-        
         unsigned long now = millis();
         timeGui = now - timeGui;
         vTaskDelay(10 / portTICK_PERIOD_MS);

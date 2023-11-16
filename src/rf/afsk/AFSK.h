@@ -20,5 +20,7 @@ class AFSK {
     private:
         std::vector<bool> nrzi(const std::vector<bool>& data);
         std::vector<double> modulate(const std::vector<bool>& data);
+        std::vector<double> silence(double seconds);
+        std::vector<double> multiply(const std::vector<double>& data, double multiplier);
 };
 

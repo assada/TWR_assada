@@ -1,4 +1,6 @@
 #include "Radio.h"
+#include "Arduino.h"
+#include <ttwr2.h>
 
 AFSK afsk;
 
@@ -24,6 +26,21 @@ void Radio::Test() {
 
     Serial.println(dataVector.size());
     Serial.println(modulated.size());
+
+
+    //Ok. lets try sent it to the radio speker lol, why not?
+
+    ledcAttachPin(SA8682ESP_AUDIO, 0);
+
+    for (double sample : modulated) {
+        // int scaled_sample = std::max(std::min(static_cast<int>(sample * 32767.0), 32767), -32768);
+        int scaled_sample = static_cast<int>((sample + 1.0) * 127.5);
+        scaled_sample = std::max(std::min(scaled_sample, 255), 0);
+
+        // analogWrite(SA8682ESP_AUDIO, scaled_sample);
+        ledcWrite(0, scaled_sample);
+        delay(1);
+    }
 }
 
 std::vector<bool> Radio::stringToBoolVector(const std::string& binaryString) { //TODO: only for tesing

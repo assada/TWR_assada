@@ -45,13 +45,25 @@ std::vector<double> AFSK::modulate(const std::vector<bool>& data) {
     return samples;
 }
 
-std::vector<double> silence(double seconds) {
+std::vector<double> AFSK::silence(double seconds) {
     size_t numSamples = static_cast<size_t>(FRAME_RATE * seconds);
+
     return std::vector<double>(numSamples, 0.0);
 }
 
+std::vector<double> AFSK::multiply(const std::vector<double>& data, double multiplier)
+{
+    std::vector<double> output;
+
+    for (double sample : data) {
+        output.push_back(sample * multiplier);
+    }
+
+    return output;
+}
+
 std::vector<double> AFSK::encode(const std::vector<bool>& binary_data) {
-    std::vector<double> modulated_data = modulate(nrzi(binary_data));
+    std::vector<double> modulated_data = this->multiply(this->modulate(nrzi(binary_data)), 0.5);
 
     std::vector<double> encoded_data;
 
