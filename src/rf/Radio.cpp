@@ -41,6 +41,7 @@ void Radio::Test() {
         ledcWrite(0, scaled_sample);
         delay(1);
     }
+    ledcDetachPin(SA8682ESP_AUDIO);
 }
 
 std::vector<bool> Radio::stringToBoolVector(const std::string& binaryString) { //TODO: only for tesing
