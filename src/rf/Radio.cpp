@@ -2,11 +2,53 @@
 #include "Arduino.h"
 #include <ttwr2.h>
 
+#include <driver/i2s.h>
+#define I2S_PORT I2S_NUM_0
+
 AFSK afsk;
 
 Radio::Radio(AT1846S *at1846s)
 {
     this->at1846s = at1846s;
+}
+
+#define PIN_I2S_BCLK    26
+#define PIN_I2S_LRC     27
+#define PIN_I2S_DIN     35
+#define PIN_I2S_DOUT    25
+
+#define bufferCnt 10
+#define bufferLen 1024
+int16_t sBuffer[bufferLen];
+
+void i2s_install() {
+    // Set up I2S Processor configuration
+    const i2s_config_t i2s_config = {
+        .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX | I2S_MODE_TX),
+        .sample_rate = 44100,
+        //.sample_rate = 16000,
+        .bits_per_sample = i2s_bits_per_sample_t(16),
+        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+        .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_I2S),
+        .intr_alloc_flags = 0,
+        .dma_buf_count = bufferCnt,
+        .dma_buf_len = bufferLen,
+        .use_apll = false
+      };
+
+    i2s_driver_install(I2S_PORT, &i2s_config, 0, NULL);
+}
+
+void i2s_setpin() {
+    // Set I2S pin configuration
+    const i2s_pin_config_t pin_config = {
+        .bck_io_num = PIN_I2S_BCLK,
+        .ws_io_num = PIN_I2S_LRC,
+        .data_out_num = PIN_I2S_DOUT,
+        .data_in_num = I2S_PIN_NO_CHANGE
+      };
+
+    i2s_set_pin(I2S_PORT, &pin_config);
 }
 
 void Radio::Start()
@@ -27,21 +69,25 @@ void Radio::Test() {
     Serial.println(dataVector.size());
     Serial.println(modulated.size());
 
+    i2s_install();
+    i2s_setpin();
+    i2s_start(I2S_PORT);
+
+    i2s_write(I2S_PORT, modulated.data(), modulated.size() * sizeof(double), nullptr, portMAX_DELAY);
+
 
     //Ok. lets try sent it to the radio speker lol, why not?
 
-    ledcAttachPin(SA8682ESP_AUDIO, 0);
+    //ledcAttachPin(SA8682ESP_AUDIO, 0);
 
-    for (double sample : modulated) {
+    // for (double sample : modulated) {
         // int scaled_sample = std::max(std::min(static_cast<int>(sample * 32767.0), 32767), -32768);
-        int scaled_sample = static_cast<int>((sample + 1.0) * 127.5);
-        scaled_sample = std::max(std::min(scaled_sample, 255), 0);
 
         // analogWrite(SA8682ESP_AUDIO, scaled_sample);
-        ledcWrite(0, scaled_sample);
-        delay(1);
-    }
-    ledcDetachPin(SA8682ESP_AUDIO);
+        //ledcWrite(0, scaled_sample);
+        //delay(1);
+    // }
+    //ledcDetachPin(SA8682ESP_AUDIO);
 }
 
 std::vector<bool> Radio::stringToBoolVector(const std::string& binaryString) { //TODO: only for tesing
